@@ -8,6 +8,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "projects")
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
