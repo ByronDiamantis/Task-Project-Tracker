@@ -12,11 +12,13 @@ import com.example.task_project_tracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
-
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
+
 public class TaskService {
 
     private final TaskRepository taskRepository;
@@ -25,6 +27,7 @@ public class TaskService {
 
 
     // 1. Δημιουργία Νέου Task
+    @Transactional
     public TaskResponse createTask(TaskRequest request) {
         Project project = projectRepository.findById(request.projectId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
@@ -53,19 +56,51 @@ public class TaskService {
     public List<TaskResponse> getTasksByProject(Long projectId) {
         return taskRepository.findByProjectId(projectId)
                 .stream()
-                .map(this::mapToTaskResponse)
+                .map(TaskService::mapToTaskResponse)
                 .toList();
     }
 
-    // 3. Helper μέθοδος μετατροπής Task Entity -> TaskResponse DTO
-    private TaskResponse mapToTaskResponse (Task task) {
+    // 3. Διαγραφή Task
+    @Transactional
+    public void deleteTask(Long taskId) {
+        if (!taskRepository.existsById(taskId)) {
+            throw new RuntimeException("Task not found");
+        }
+        taskRepository.deleteById(taskId);
+    }
+
+    // 4. Επεξεργασία / Ενημέρωση Task
+    @Transactional
+    public TaskResponse updateTask(Long taskId, TaskRequest request) {
+
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found"));
+
+        task.setTitle(request.title());
+        task.setDescription(request.description());
+        if (request.status() != null) {
+            task.setStatus(request.status());
+        }
+
+        if (request.assigneeId() != null) {
+            User newAssignee = userRepository.findById(request.assigneeId())
+                    .orElseThrow(() -> new RuntimeException("Assignee not found"));
+            task.setAssignee(newAssignee);
+        } else {
+            task.setAssignee(null);
+        }
+
+        Task updatedTask = taskRepository.save(task);
+        return mapToTaskResponse(updatedTask);
+    }
+
+    // 5. Helper μέθοδος μετατροπής Task Entity -> TaskResponse DTO
+    protected static TaskResponse mapToTaskResponse(Task task) {
         UserResponse assigneeResponse = null;
         if (task.getAssignee() != null) {
             assigneeResponse = new UserResponse(
                     task.getAssignee().getId(),
                     task.getAssignee().getUsername(),
-                    task.getAssignee().getEmail(),
-                    task.getAssignee().getCreatedAt()
+                    task.getAssignee().getEmail()
             );
         }
         return new TaskResponse(
