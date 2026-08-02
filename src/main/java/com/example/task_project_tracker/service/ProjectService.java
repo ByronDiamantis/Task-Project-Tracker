@@ -45,10 +45,18 @@ public class ProjectService {
     }
 
     // 3. Αναζήτηση συγκεκριμένου Project με βάση το ID
-    public ProjectResponse getProjectsByOwner(Long projectId) {
+    public ProjectResponse getProjectsById(Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
         return mapToProjectResponse(project);
+    }
+
+    // 4. Διαγραφή Project με βάση το ID
+    @Transactional
+    public void deleteProject(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        projectRepository.delete(project);
     }
 
     // Helper method: Μετατροπή Entity σε Response DTO

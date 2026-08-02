@@ -93,7 +93,14 @@ public class TaskService {
         return mapToTaskResponse(updatedTask);
     }
 
-    // 5. Helper μέθοδος μετατροπής Task Entity -> TaskResponse DTO
+    // 5. Λήψη συγκεκριμένου Task με βάση το ID
+    public TaskResponse getTaskById (Long taskId) {
+        Task task  = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+        return mapToTaskResponse(task);
+    }
+
+    //  Helper μέθοδος μετατροπής Task Entity -> TaskResponse DTO
     protected static TaskResponse mapToTaskResponse(Task task) {
         UserResponse assigneeResponse = null;
         if (task.getAssignee() != null) {
