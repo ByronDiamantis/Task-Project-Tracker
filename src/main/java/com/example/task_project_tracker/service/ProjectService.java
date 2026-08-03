@@ -27,9 +27,8 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
 
         Project project = new Project();
-        project.getCreatedAt();
-        project.getTitle();
-        project.getDescription();
+        project.setTitle(request.name());              // Set το title από το request.name()
+        project.setDescription(request.description()); // Set το description
         project.setOwner(owner);
 
         Project savedProject = projectRepository.save(project);
