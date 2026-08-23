@@ -1,0 +1,7 @@
+<nav class="navbar" *ngIf="currentUser">
+  <div class="logo">🚀 Task Tracker</div>
+  <div class="user-info">
+    <span>Καλωσόρισες, <strong>{{ currentUser.username }}</strong></span>
+    <button class="btn-logout" (click)="logout()">Αποσύνδεση</button>
+  </div>
+</nav>
