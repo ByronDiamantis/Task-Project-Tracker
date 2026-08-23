@@ -1,0 +1,91 @@
+<div class="task-board-container">
+    <div class="create-task-card">
+        <h3>Νέο Task</h3>
+        <form (ngSubmit)="createTask()" class="task-form">
+            <input
+                type="text"
+                [(ngModel)]="newTask.title"
+                name="title"
+                placeholder="Τίτλος Task..."
+                required
+            />
+            <input
+                type="text"
+                [(ngModel)]="newTask.description"
+                name="description"
+                placeholder="Περιγραφή..."
+            />
+            <select [(ngModel)]="newTask.priority" name="priority">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+            </select>            
+            <button type="submit" class="btn-add">+ Προσθήκη</button>
+        </form>
+        
+        <div class="board-columns">
+
+            <!-- Στήλη TODO -->
+            <div class="column">
+                <div class="column-header todo-header">
+                    <h4>To Do ({{ todoTasks.length }})</h4>
+                </div>
+                <div class="task-list">
+                    <div *ngFor="let task of todoTasks" class="task-card">
+                        <h5>{{ task.title }}</h5>
+                        <p>{{ task.description }}</p>
+                        <span class="badge" [ngClass]="task.priority?.toLowerCase() || 'medium'">
+                            {{ task.priority }}
+                        </span>  
+                                        
+                        <div class="card-actions">
+                            <button (click)="updateTaskStatus(task, 'IN_PROGRESS')">➡️ In Progress</button>
+                            <button class="btn-del" (click)="deleteTask(task.id)">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Στήλη IN_PROGRESS -->
+            <div class="column">
+                <div class="column-header progress-header">
+                    <h4>In Progress ({{ inProgressTasks.length }})</h4>
+                </div>
+                <div class="task-list">
+                    <div *ngFor="let task of inProgressTasks" class="task-card">
+                        <h5>{{ task.title }}</h5>
+                        <p> {{ task.description }}</p>
+                        <span class="badge" [ngClass]="task.priority?.toLowerCase() || 'medium'">
+                            {{ task.priority }}
+                        </span>
+
+                        <div class="card-actions">
+                            <button (click)="updateTaskStatus(task, 'TODO')">⬅️ To Do</button>
+                            <button (click)="updateTaskStatus(task, 'DONE')">➡️ Done</button>
+                            <button class="btn-del" (click)="deleteTask(task.id)">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            
+            <!-- Στήλη DONE -->
+            <div class="column">
+                <div class="column-header done-header">
+                    <h4>Done ({{ doneTasks.length }})</h4>
+                </div>
+                <div class="task-list">
+                    <div *ngFor="let task of doneTasks" class="task-card done-card">
+                        <h5>{{ task.title }}</h5>
+                        <p>{{ task.description }}</p>
+
+                        <div class="card-actions">
+                            <button (click)="updateTaskStatus(task, 'IN_PROGRESS')">⬅️ In Progress</button>
+                            <button class="btn-del" (click)="deleteTask(task.id)">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>      
+</div>
+

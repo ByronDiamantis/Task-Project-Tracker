@@ -1,0 +1,45 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2d3748; // Σκούρο μπλε/γκρι background
+  padding: 15px 30px;
+  color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+
+  .logo {
+    font-size: 1.25rem;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.95rem;
+
+    strong {
+      color: #e2e8f0;
+    }
+
+    .btn-logout {
+      background-color: #e53e3e; // Κόκκινο κουμπί
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+
+      &:hover {
+        background-color: #c53030; // Σκουρότερο κόκκινο στο hover
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+  }
+}

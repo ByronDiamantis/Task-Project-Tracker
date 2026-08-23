@@ -1,0 +1,142 @@
+<div class="auth-wrapper">
+
+  <div class="auth-card">
+
+    <div class="auth-header"> 
+
+      <h2>{{ isLoginMode ? 'Σύνδεση Χρήστη' : 'Δημιουργία Λογαριασμού' }}</h2>
+
+      <p>{{ isLoginMode ? 'Εισάγετε τα στοιχεία σας για είσοδο' : 'Συμπληρώστε τη φόρμα για εγγραφή' }}</p>
+
+    </div>
+
+
+
+    <form (ngSubmit)="onSubmit()" #form="ngForm">
+
+      
+      <!-- Username (Εμφανίζεται ΜΟΝΟ στο Register) -->
+
+      <div *ngIf="!isLoginMode" class="form-group">
+
+        <label for="username">Όνομα Χρήστη (Username)</label>
+
+        <input 
+
+          type="text" 
+
+          id="username" 
+
+          name="username" 
+
+          [(ngModel)]="userForm.username" 
+
+          placeholder="π.χ. alex" 
+
+          required 
+
+        />
+
+      </div>
+
+
+
+      <!-- Email (Εμφανίζεται ΠΑΝΤΑ: και σε Login και σε Register) -->
+
+      <div class="form-group">
+
+        <label for="email">Email</label>
+
+        <input 
+
+          type="email" 
+
+          id="email" 
+
+          name="email" 
+
+          [(ngModel)]="userForm.email" 
+
+          placeholder="alex@example.com" 
+
+          required 
+
+        />
+
+      </div>
+
+
+
+      <!-- Password -->
+
+      <div class="form-group">
+
+        <label for="password">Κωδικός Πρόσβασης</label>
+
+        <input 
+
+          type="password" 
+
+          id="password" 
+
+          name="password" 
+
+          [(ngModel)]="userForm.password" 
+
+          placeholder="••••••••" 
+
+          required 
+
+        />
+
+      </div>
+
+
+
+      <!-- Error Message -->
+
+      <div *ngIf="errorMessage" class="error-banner">
+
+        {{ errorMessage }}
+
+      </div>
+
+
+
+      <!-- Submit Button -->
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+
+        {{ isLoading ? 'Παρακαλώ περιμένετε...' : (isLoginMode ? 'Σύνδεση' : 'Εγγραφή') }}
+
+      </button>
+
+
+
+    </form>
+
+
+
+    <!-- Toggle Login / Register -->
+
+    <div class="auth-footer">
+
+      <p>
+
+        {{ isLoginMode ? 'Δεν έχετε λογαριασμό;' : 'Έχετε ήδη λογαριασμό;' }}
+
+        <button type="button" class="btn-link" (click)="toggleMode()">
+
+          {{ isLoginMode ? 'Εγγραφή εδώ' : 'Σύνδεση εδώ' }}
+
+        </button>
+
+      </p>
+
+    </div>
+
+
+  </div>
+
+</div>
+

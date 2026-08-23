@@ -9,6 +9,6 @@ export interface Task {
     dueDate?: string;
     createdAt?: string;
     projectId: number;
-    assignee: User | null;
+    assignee?: User | null;
     assigneeId?: number;
 }
