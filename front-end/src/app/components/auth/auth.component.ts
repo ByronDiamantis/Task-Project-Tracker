@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../services/user/user.service';
 import { User } from '../../models/user';
 import { Router } from '@angular/router';
 
@@ -60,7 +60,7 @@ export class AuthComponent {
         next: (userResponse: User) => { 
           this.isLoading = false; 
           this.userService.setUserInStorage(userResponse);
-          this.router.navigate(['/projects']);  
+          this.router.navigate(['/projects'], { replaceUrl: true });      
         },
         error: (err) => {
           this.isLoading = false;
@@ -71,7 +71,10 @@ export class AuthComponent {
     } else {
       //register
       this.userService.register(this.userForm as User).subscribe({
-        next: () => { this.isLoading = false; },
+        next: () => { 
+          this.isLoading = false; 
+          this.isLoginMode = true;
+        },
         error: (err) => { 
           this.isLoading = false;
           console.error('Registration error:', err);

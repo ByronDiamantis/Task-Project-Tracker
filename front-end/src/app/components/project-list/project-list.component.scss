@@ -114,3 +114,50 @@
   font-style: italic;
   margin-top: 15px;
 }
+
+/* Container για το προβαλλόμενο Project Detail View */
+.project-detail-view {
+  animation: fadeIn 0.25s ease-in-out;
+  padding: 1rem 0;
+}
+
+/* Κουμπί Πίσω στα Projects */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-back:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+  border-color: #9ca3af;
+  transform: translateX(-3px); /* Subtraction effect για το εφέ πίσω */
+}
+
+.btn-back:active {
+  transform: translateX(-1px);
+}
+
+/* Smooth Fade-in Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

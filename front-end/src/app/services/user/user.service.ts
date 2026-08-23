@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { User } from '../models/user';
+import { User } from '../../models/user';
 
 
 @Injectable({
@@ -24,6 +24,10 @@ export class UserService {
 
   loginUser(credentials: { email: string; password?: string }): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/login`, credentials);  
+  }
+
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.apiUrl);
   }
 
   logout(): void {
