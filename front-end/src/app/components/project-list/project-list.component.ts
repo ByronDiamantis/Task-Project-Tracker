@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProjectService } from '../../services/project.service';
-import { UserService } from '../../services/user.service';
-import { Project } from '../../models/project';
+import { ProjectService } from '../../services/project/project.service';
+import { UserService } from '../../services/user/user.service';
+import { ProjectRequest, ProjectResponse } from '../../models/project';
 import { User } from '../../models/user';
 import { TaskBoardComponent } from '../task-board/task-board.component'; 
 import { Router } from '@angular/router';
@@ -16,98 +16,72 @@ import { Router } from '@angular/router';
   templateUrl: './project-list.component.html',
   styleUrl: './project-list.component.scss'
 })
-export class ProjectListComponent implements OnInit {
-  projects: Project[] = [];
-  currentUser: User | null = null;
-  selectedProjectId: number | null = null;
-  isCreating: boolean = false;
 
-  newProject: Project = {
+export class ProjectListComponent implements OnInit {
+  projects: ProjectResponse[] = [];
+  selectedProjectId: number | null = null;
+
+  newProject = {
     title: '',
-    description: '',
-    ownerId: 0
+    description: ''
   };
 
   constructor(
     private projectService: ProjectService,
-    private userService: UserService,
-    private router: Router
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
-    this.currentUser = this.userService.getCurrentUser();
-    if (this.currentUser && this.currentUser.id) {
-      this.newProject.ownerId = this.currentUser.id;
-      this.loadProjects(this.currentUser.id);
-    } 
+    const user = this.userService.getCurrentUser();
+    const ownerId = user?.id || (user as any)?.userId;
+    if (ownerId) {
+      this.loadProjects(ownerId);
+    }
   }
 
   loadProjects(ownerId: number): void {
     this.projectService.getProjectsByOwner(ownerId).subscribe({
       next: (data) => (this.projects = data),
-      error: (err) => console.error('Error fetching projects', err)
+      error: (err) => console.error('Error fetching projects:', err)
     });
   }
 
   createProject(): void {
-    this.currentUser = this.userService.getCurrentUser();
-    const userId = this.currentUser?.id || (this.currentUser as any)?.userId;
+    const user = this.userService.getCurrentUser();
+    const ownerId = user?.id || (user as any)?.userId;
 
-    if (!this.newProject.title?.trim()) {
-      alert('Παρακαλώ συμπλήρωσε τον τίτλο του project.');
-      return;
-    }
+    if (!this.newProject.title.trim() || !ownerId) return;
 
-    if (!userId) {
-      alert('Δεν βρέθηκε ID συνδεδεμένου χρήστη. Κάνε ξανά login!');
-      return;
-    }
-
-    // Δημιουργία payload βάσει του ProjectRequest DTO της Java
-    const payload = {
-      name: this.newProject.title.trim(), // 👈 Το backend περιμένει 'name' αντί για 'title'
-      description: this.newProject.description ? this.newProject.description.trim() : '',
-      ownerId: Number(userId)             // 👈 Το backend περιμένει 'ownerId' ως αριθμό
+    const payload: ProjectRequest = {
+      name: this.newProject.title.trim(),
+      description: this.newProject.description.trim(),
+      ownerId: Number(ownerId)
     };
 
-    console.log('Sending correct DTO payload:', payload);
-
-    this.projectService.createProject(payload as any).subscribe({
+    this.projectService.createProject(payload).subscribe({
       next: (createdProject) => {
-        console.log('Project created successfully:', createdProject);
         this.projects.push(createdProject);
-        this.newProject = { title: '', description: '', ownerId: userId };
+        this.newProject = { title: '', description: '' };
       },
-      error: (err) => {
-        console.error('Error creating project:', err);
-        alert('Σφάλμα κατά τη δημιουργία project. Δες την κονσόλα.');
-      }
+      error: (err) => console.error('Error creating project:', err)
     });
   }
 
-  deleteProject(id?: number, event?: Event): void {
-    if (event) {
-      event.stopPropagation(); // Αποφεύγουμε το άνοιγμα του project όταν πατάμε διαγραφή
-    }
-    if (!id) return;
-
-    if(confirm('Είσαι σίγουρος ότι θέλεις να διαγράψεις αυτό το Project;')) {
+  deleteProject(id: number, event: Event): void {
+    event.stopPropagation();
+    if (confirm('Θέλετε να διαγράψετε αυτό το Project;')) {
       this.projectService.deleteProject(id).subscribe({
         next: () => {
-          this.projects = this.projects.filter(p => p.id !== id);
-          if (this.selectedProjectId === id) {
-            this.selectedProjectId = null;
-          }
+          this.projects = this.projects.filter((p) => p.id !== id);
+          if (this.selectedProjectId === id) this.selectedProjectId = null;
         },
-        error: (err) => console.error('Error deleting project', err)
+        error: (err) => console.error('Error deleting project:', err)
       });
     }
   }
 
-  selectProject(id?:number): void {
-    if (id) {
-      this.selectedProjectId = id;
-    }
+  selectProject(id: number): void {
+    this.selectedProjectId = id;
   }
 
   backToProjects(): void {

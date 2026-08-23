@@ -54,7 +54,7 @@
     </div>
 
     <!-- 2. ΠΡΟΒΟΛΗ TASK BOARD (όταν ΕΧΕΙ επιλεγεί project) -->
-    <div *ngIf="selectedProjectId">
+    <div *ngIf="selectedProjectId" class="project-detail-view">
         <button class="btn-back" (click)="backToProjects()">← Πίσω στα Projects</button>
     
         <!-- Συνδέουμε το TaskBoardComponent περνώντας το selectedProjectId -->

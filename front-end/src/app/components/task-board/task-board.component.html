@@ -19,7 +19,16 @@
                 <option value="LOW">Low</option>
                 <option value="MEDIUM">Medium</option>
                 <option value="HIGH">High</option>
-            </select>            
+            </select>
+            
+            <!-- Επιλογή Assignee (Χρήστη) -->
+            <select [(ngModel)]="newTask.assigneeId" name="assigneeId">
+                <option [ngValue]="undefined">-- Χωρίς Ανάθεση --</option>
+                <option *ngFor="let user of users" [value]="user.id">
+                    {{ user.username || user.name || user.email }}
+                </option>
+            </select>
+
             <button type="submit" class="btn-add">+ Προσθήκη</button>
         </form>
         
@@ -34,9 +43,16 @@
                     <div *ngFor="let task of todoTasks" class="task-card">
                         <h5>{{ task.title }}</h5>
                         <p>{{ task.description }}</p>
-                        <span class="badge" [ngClass]="task.priority?.toLowerCase() || 'medium'">
-                            {{ task.priority }}
-                        </span>  
+                        
+                        <div class="card-meta">
+                            <span class="badge" [ngClass]="task.priority.toLowerCase() || 'medium'">
+                                {{ task.priority }}
+                            </span>
+                            <!-- Εμφάνιση Assigned User -->
+                            <span class="assignee-tag" *ngIf="task.assignee">
+                                👤 {{ task.assignee.username || task.assignee.name }}
+                            </span>
+                        </div>
                                         
                         <div class="card-actions">
                             <button (click)="updateTaskStatus(task, 'IN_PROGRESS')">➡️ In Progress</button>
@@ -54,10 +70,17 @@
                 <div class="task-list">
                     <div *ngFor="let task of inProgressTasks" class="task-card">
                         <h5>{{ task.title }}</h5>
-                        <p> {{ task.description }}</p>
-                        <span class="badge" [ngClass]="task.priority?.toLowerCase() || 'medium'">
-                            {{ task.priority }}
-                        </span>
+                        <p>{{ task.description }}</p>
+
+                        <div class="card-meta">
+                            <span class="badge" [ngClass]="task.priority.toLowerCase() || 'medium'">
+                                {{ task.priority }}
+                            </span>
+                            <!-- Εμφάνιση Assigned User -->
+                            <span class="assignee-tag" *ngIf="task.assignee">
+                                👤 {{ task.assignee.username || task.assignee.name }}
+                            </span>
+                        </div>
 
                         <div class="card-actions">
                             <button (click)="updateTaskStatus(task, 'TODO')">⬅️ To Do</button>
@@ -78,6 +101,13 @@
                         <h5>{{ task.title }}</h5>
                         <p>{{ task.description }}</p>
 
+                        <div class="card-meta" *ngIf="task.assignee">
+                            <!-- Εμφάνιση Assigned User -->
+                            <span class="assignee-tag">
+                                👤 {{ task.assignee.username || task.assignee.name }}
+                            </span>
+                        </div>
+
                         <div class="card-actions">
                             <button (click)="updateTaskStatus(task, 'IN_PROGRESS')">⬅️ In Progress</button>
                             <button class="btn-del" (click)="deleteTask(task.id)">🗑️</button>
@@ -85,7 +115,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>      
 </div>
-

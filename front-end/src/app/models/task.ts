@@ -1,14 +1,33 @@
-import { User } from "./user";
+export enum TaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE'
+}
 
-export interface Task {
-    id?: number;
-    title: string;
-    description: string;
-    status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-    priority?: 'LOW' | 'MEDIUM' | 'HIGH';
-    dueDate?: string;
-    createdAt?: string;
-    projectId: number;
-    assignee?: User | null;
-    assigneeId?: number;
+export enum TaskPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH'
+}
+
+export interface TaskRequest {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  dueDate?: string; 
+  projectId: number;
+  assigneeId?: number;
+}
+
+export interface TaskResponse {
+  id: number;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueDate?: string;
+  createdAt: string;
+  projectId: number;
+  assignee?: any;
 }
