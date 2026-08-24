@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../services/task/task.service';
 import { UserService } from '../../services/user/user.service';
@@ -48,9 +49,32 @@ export class TaskBoardComponent implements OnInit, OnChanges {
   }
 
   loadTasks(): void {
-    this.taskService.getTasksByProject(this.projectId).subscribe({
-      next: (data: TaskResponse[]) => (this.tasks = data),
-      error: (err) => console.error('Error loading tasks:', err)
+    const currentUser = this.userService.getCurrentUser();
+
+    if (!currentUser || !currentUser.id) {
+      
+      this.taskService.getTasksByProject(this.projectId).subscribe({
+        next: (data) => (this.tasks = data),
+        error: (err) => console.error('Error loading tasks:', err)
+      });
+      return;
+    }
+
+    forkJoin({
+      projectTasks: this.taskService.getTasksByProject(this.projectId),
+      assignedTasks: this.taskService.getTasksByAssignee(currentUser.id)
+    }).subscribe({
+      next: ({ projectTasks, assignedTasks }) => {
+
+        const combined = [...projectTasks, ...assignedTasks];
+
+        const uniqueTasks = Array.from(
+          new Map(combined.map((task) => [task.id, task])).values()
+        );
+
+        this.tasks = uniqueTasks;
+      },
+      error: (err) => console.error('Error loading combined tasks:', err)
     });
   }
 
