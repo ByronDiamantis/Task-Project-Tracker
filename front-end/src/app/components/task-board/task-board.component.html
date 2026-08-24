@@ -24,7 +24,7 @@
             <!-- Επιλογή Assignee (Χρήστη) -->
             <select [(ngModel)]="newTask.assigneeId" name="assigneeId">
                 <option [ngValue]="undefined">-- Χωρίς Ανάθεση --</option>
-                <option *ngFor="let user of users" [value]="user.id">
+                <option *ngFor="let user of users" [ngValue]="user.id">
                     {{ user.username || user.name || user.email }}
                 </option>
             </select>
@@ -45,7 +45,7 @@
                         <p>{{ task.description }}</p>
                         
                         <div class="card-meta">
-                            <span class="badge" [ngClass]="task.priority.toLowerCase() || 'medium'">
+                            <span class="badge" [ngClass]="task.priority?.toLowerCase() || 'medium'">
                                 {{ task.priority }}
                             </span>
                             <!-- Εμφάνιση Assigned User -->
@@ -73,7 +73,7 @@
                         <p>{{ task.description }}</p>
 
                         <div class="card-meta">
-                            <span class="badge" [ngClass]="task.priority.toLowerCase() || 'medium'">
+                            <span class="badge" [ngClass]="task.priority?.toLowerCase() || 'medium'">
                                 {{ task.priority }}
                             </span>
                             <!-- Εμφάνιση Assigned User -->
@@ -101,9 +101,12 @@
                         <h5>{{ task.title }}</h5>
                         <p>{{ task.description }}</p>
 
-                        <div class="card-meta" *ngIf="task.assignee">
+                        <div class="card-meta">
+                            <span class="badge" [ngClass]="task.priority?.toLowerCase() || 'medium'">
+                                {{ task.priority }}
+                            </span>
                             <!-- Εμφάνιση Assigned User -->
-                            <span class="assignee-tag">
+                            <span class="assignee-tag" *ngIf="task.assignee">
                                 👤 {{ task.assignee.username || task.assignee.name }}
                             </span>
                         </div>

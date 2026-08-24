@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../../services/project/project.service';
 import { UserService } from '../../services/user/user.service';
 import { ProjectRequest, ProjectResponse } from '../../models/project';
-import { User } from '../../models/user';
 import { TaskBoardComponent } from '../task-board/task-board.component'; 
-import { Router } from '@angular/router';
+import { TaskService } from '../../services/task/task.service';
+import { TaskResponse } from '../../models/task';
 
 
 @Component({
@@ -19,6 +19,7 @@ import { Router } from '@angular/router';
 
 export class ProjectListComponent implements OnInit {
   projects: ProjectResponse[] = [];
+  assignedTasks: TaskResponse[] = [];
   selectedProjectId: number | null = null;
 
   newProject = {
@@ -28,7 +29,8 @@ export class ProjectListComponent implements OnInit {
 
   constructor(
     private projectService: ProjectService,
-    private userService: UserService
+    private userService: UserService,
+    private taskService: TaskService
   ) {}
 
   ngOnInit(): void {
@@ -36,13 +38,22 @@ export class ProjectListComponent implements OnInit {
     const ownerId = user?.id || (user as any)?.userId;
     if (ownerId) {
       this.loadProjects(ownerId);
+      this.loadAssignedTasks(ownerId);
     }
   }
 
   loadProjects(ownerId: number): void {
+    
     this.projectService.getProjectsByOwner(ownerId).subscribe({
       next: (data) => (this.projects = data),
       error: (err) => console.error('Error fetching projects:', err)
+    });
+  }
+
+  loadAssignedTasks(userId: number): void {
+    this.taskService.getTasksByAssignee(userId).subscribe({
+      next: (tasks) => (this.assignedTasks = tasks),
+      error: (err) => console.error('Error fetching assigned tasks:', err)
     });
   }
 
@@ -86,5 +97,10 @@ export class ProjectListComponent implements OnInit {
 
   backToProjects(): void {
     this.selectedProjectId = null;
+    const user = this.userService.getCurrentUser();
+    const ownerId = user?.id || (user as any)?.userId;
+    if (ownerId) {
+      this.loadAssignedTasks(ownerId);
+    }
   }
 }

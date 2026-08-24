@@ -1,14 +1,14 @@
 import { TaskResponse } from "./task";
 
 export interface ProjectRequest {
-  name: string;        // Στον Request περιμένει 'name'
+  name: string;        
   description?: string;
   ownerId: number;
 }
 
 export interface ProjectResponse {
   id: number;
-  title: string;       // Στον Response επιστρέφει 'title'
+  title: string;       
   description: string;
   ownerId: number;
   ownerName: string;
