@@ -35,6 +35,12 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getTaskById(taskId));
     }
 
+    // GET /api/tasks/assignee/{assigneeId} - Λήψη όλων των Tasks που έχουν ανατεθεί σε συγκεκριμένο χρήστη
+    @GetMapping("/assignee/{assigneeId}")
+    public ResponseEntity<List<TaskResponse>> getTasksByAssignee(@PathVariable Long assigneeId) {
+        return ResponseEntity.ok(taskService.getTasksByAssignee(assigneeId));
+    }
+
     // DELETE /api/tasks/{taskId} - Διαγραφή Task με βάση το ID
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {

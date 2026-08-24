@@ -77,8 +77,13 @@ public class TaskService {
 
         task.setTitle(request.title());
         task.setDescription(request.description());
+
         if (request.status() != null) {
             task.setStatus(request.status());
+        }
+
+        if (request.priority() != null) {
+            task.setPriority(request.priority());
         }
 
         if (request.assigneeId() != null) {
@@ -100,7 +105,15 @@ public class TaskService {
         return mapToTaskResponse(task);
     }
 
-    //  Helper μέθοδος μετατροπής Task Entity -> TaskResponse DTO
+    // 6. Λήψη tasks με βάση τον Assignee
+    public List<TaskResponse> getTasksByAssignee(Long assigneeId) {
+        return taskRepository.findByAssigneeId(assigneeId)
+                .stream()
+                .map(TaskService::mapToTaskResponse)
+                .toList();
+    }
+
+    // Helper μέθοδος μετατροπής Task Entity -> TaskResponse DTO
     protected static TaskResponse mapToTaskResponse(Task task) {
         UserResponse assigneeResponse = null;
         if (task.getAssignee() != null) {
