@@ -24,7 +24,7 @@ formatted in a **Kanban Board** (To Do, In Progress, Done), and assign them to o
 * **User Auth & Mangement: ** User Registration and Login with secure session storage in `lacalStorage`.
 * **Project CRUD:** Create, view, and delete projects per logged-in user (Owner).
 *  **Kanban Task Board:**
-  * Create tasks with title, description, priority (`LOW`, `MEDIUM`, `HIGH`), and due date.
+  * Create tasks with title, description and priority (`LOW`, `MEDIUM`, `HIGH`).
   * Ability to **assign** a task to any user in the database.
   * Real-time status updates (`TODO` -> `IN_PROGRESS` -> `DONE`).
 * **Guards & Navigation:** Route protection (Auth Guards) and automatic browser history management (`replaceUrl`).
