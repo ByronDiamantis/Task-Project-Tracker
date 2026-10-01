@@ -2,7 +2,8 @@ package com.example.task_project_tracker.service;
 
 import com.example.task_project_tracker.dto.task.TaskRequest;
 import com.example.task_project_tracker.dto.task.TaskResponse;
-import com.example.task_project_tracker.dto.user.UserResponse;
+import com.example.task_project_tracker.exception.ResourceNotFoundException;
+import com.example.task_project_tracker.mapper.TaskMapper;
 import com.example.task_project_tracker.model.Project;
 import com.example.task_project_tracker.model.Task;
 import com.example.task_project_tracker.model.User;
@@ -24,115 +25,89 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
-
+    private final TaskMapper taskMapper;
 
     // 1. Δημιουργία Νέου Task
     @Transactional
     public TaskResponse createTask(TaskRequest request) {
         Project project = projectRepository.findById(request.projectId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + request.projectId()));
 
         User assignee = null;
         if (request.assigneeId() != null) {
             assignee = userRepository.findById(request.assigneeId())
-                    .orElseThrow(() -> new RuntimeException("Assignee not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.assigneeId()));
         }
 
-        Task task = Task.builder()
-                .title(request.title())
-                .description(request.description())
-                .status(request.status())
-                .priority(request.priority())
-                .dueDate(request.dueDate())
-                .project(project)
-                .assignee(assignee)
-                .build();
-
+        Task task = taskMapper.toEntity(request, project, assignee);
         Task savedTask = taskRepository.save(task);
-        return mapToTaskResponse(savedTask);
+
+        return taskMapper.toResponse(savedTask);
     }
 
     // 2. Λήψη όλων των Tasks για ένα Project
     public List<TaskResponse> getTasksByProject(Long projectId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new ResourceNotFoundException("Project not found with id: " + projectId);
+        }
         return taskRepository.findByProjectId(projectId)
                 .stream()
-                .map(TaskService::mapToTaskResponse)
+                .map(taskMapper::toResponse)
                 .toList();
     }
 
     // 3. Διαγραφή Task
     @Transactional
     public void deleteTask(Long taskId) {
-        if (!taskRepository.existsById(taskId)) {
-            throw new RuntimeException("Task not found");
-        }
-        taskRepository.deleteById(taskId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+
+        taskRepository.delete(task);
     }
 
     // 4. Επεξεργασία / Ενημέρωση Task
     @Transactional
     public TaskResponse updateTask(Long taskId, TaskRequest request) {
+        Task existingTask = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
 
-        Task task = taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found"));
+        Project project = projectRepository.findById(request.projectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + request.projectId()));
 
-        task.setTitle(request.title());
-        task.setDescription(request.description());
-
-        if (request.status() != null) {
-            task.setStatus(request.status());
-        }
-
-        if (request.priority() != null) {
-            task.setPriority(request.priority());
-        }
-
+        User assignee = null;
         if (request.assigneeId() != null) {
-            User newAssignee = userRepository.findById(request.assigneeId())
-                    .orElseThrow(() -> new RuntimeException("Assignee not found"));
-            task.setAssignee(newAssignee);
-        } else {
-            task.setAssignee(null);
+            assignee = userRepository.findById(request.assigneeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.assigneeId()));
         }
 
-        Task updatedTask = taskRepository.save(task);
-        return mapToTaskResponse(updatedTask);
+        existingTask.setTitle(request.title());
+        existingTask.setDescription(request.description());
+        existingTask.setStatus(request.status());
+        existingTask.setPriority(request.priority());
+        existingTask.setDueDate(request.dueDate());
+        existingTask.setProject(project);
+        existingTask.setAssignee(assignee);
+
+        Task updatedTask = taskRepository.save(existingTask);
+        return taskMapper.toResponse(updatedTask);
     }
 
     // 5. Λήψη συγκεκριμένου Task με βάση το ID
     public TaskResponse getTaskById (Long taskId) {
         Task task  = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
-        return mapToTaskResponse(task);
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+        return taskMapper.toResponse(task);
     }
 
     // 6. Λήψη tasks με βάση τον Assignee
     public List<TaskResponse> getTasksByAssignee(Long assigneeId) {
+        if (!userRepository.existsById(assigneeId)) {
+            throw new ResourceNotFoundException("User not found with id: " + assigneeId);
+        }
         return taskRepository.findByAssigneeId(assigneeId)
                 .stream()
-                .map(TaskService::mapToTaskResponse)
+                .map(taskMapper::toResponse)
                 .toList();
     }
 
-    // Helper μέθοδος μετατροπής Task Entity -> TaskResponse DTO
-    protected static TaskResponse mapToTaskResponse(Task task) {
-        UserResponse assigneeResponse = null;
-        if (task.getAssignee() != null) {
-            assigneeResponse = new UserResponse(
-                    task.getAssignee().getId(),
-                    task.getAssignee().getUsername(),
-                    task.getAssignee().getEmail()
-            );
-        }
-        return new TaskResponse(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getStatus(),
-                task.getPriority(),
-                task.getDueDate(),
-                task.getCreatedAt(),
-                task.getProject().getId(),
-                assigneeResponse
-        );
-    }
 }

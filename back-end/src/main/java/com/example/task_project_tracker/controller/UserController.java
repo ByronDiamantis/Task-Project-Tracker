@@ -4,6 +4,7 @@ import com.example.task_project_tracker.dto.user.LoginRequest;
 import com.example.task_project_tracker.dto.user.UserRequest;
 import com.example.task_project_tracker.dto.user.UserResponse;
 import com.example.task_project_tracker.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
 
@@ -20,15 +21,15 @@ public class UserController {
 
     // POST /api/users/register - Εγγραφή νέου χρήστη
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
         UserResponse userResponse = userService.createUser(request);
         return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
     }
 
     // POST /api/users/login - Σύνδεση χρήστη
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> loginUser(@RequestBody LoginRequest request) {
-        UserResponse response = userService.LoginUser(request);
+    public ResponseEntity<UserResponse> loginUser(@Valid @RequestBody LoginRequest request) {
+        UserResponse response = userService.loginUser(request);
         return ResponseEntity.ok(response);
     }
 

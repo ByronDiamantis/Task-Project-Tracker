@@ -3,6 +3,7 @@ package com.example.task_project_tracker.controller;
 import com.example.task_project_tracker.dto.project.ProjectRequest;
 import com.example.task_project_tracker.dto.project.ProjectResponse;
 import com.example.task_project_tracker.service.ProjectService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +12,14 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/projects")
+@RequestMapping("/api/projects")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ProjectController {
     final ProjectService projectService;
 
     // POST /api/projects - Δημιουργία νέου Project
     @PostMapping
-    public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest request) {
+    public ResponseEntity<ProjectResponse> createProject(@Valid @RequestBody ProjectRequest request) {
         ProjectResponse projectResponse = projectService.createProject(request);
         return new ResponseEntity<>(projectResponse, HttpStatus.CREATED);
     }
@@ -32,7 +33,7 @@ public class ProjectController {
     // GET /api/projects/{id} - Λήψη συγκεκριμένου Project με τα Tasks του
     @GetMapping("/{id}")
     public ResponseEntity<ProjectResponse> getProjectById(@PathVariable Long id) {
-        return ResponseEntity.ok(projectService.getProjectsById(id));
+        return ResponseEntity.ok(projectService.getProjectById(id));
     }
 
     // DELETE /api/projects/{id} - Διαγραφή Project με βάση το ID

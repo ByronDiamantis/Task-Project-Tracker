@@ -3,6 +3,7 @@ package com.example.task_project_tracker.controller;
 import com.example.task_project_tracker.dto.task.TaskRequest;
 import com.example.task_project_tracker.dto.task.TaskResponse;
 import com.example.task_project_tracker.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +12,14 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/tasks")
+@RequestMapping("/api/tasks")
 @CrossOrigin(origins = "http://localhost:4200")
 public class TaskController {
-    final TaskService taskService;
+    private final TaskService taskService;
 
     // POST /api/tasks - Δημιουργία νέου Task
     @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest request) {
+    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest request) {
         TaskResponse taskResponse = taskService.createTask(request);
         return new ResponseEntity<>(taskResponse, HttpStatus.CREATED);
     }
@@ -50,7 +51,7 @@ public class TaskController {
 
     // PUT /api/tasks/{taskId} - Ενημέρωση Task με βάση το ID
     @PutMapping("/{taskId}")
-    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long taskId, @RequestBody TaskRequest request) {
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long taskId,@Valid @RequestBody TaskRequest request) {
         TaskResponse taskResponse = taskService.updateTask(taskId, request);
         return ResponseEntity.ok(taskResponse);
     }
