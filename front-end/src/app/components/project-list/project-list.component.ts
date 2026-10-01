@@ -64,7 +64,7 @@ export class ProjectListComponent implements OnInit {
     if (!this.newProject.title.trim() || !ownerId) return;
 
     const payload: ProjectRequest = {
-      name: this.newProject.title.trim(),
+      title: this.newProject.title.trim(),
       description: this.newProject.description.trim(),
       ownerId: Number(ownerId)
     };

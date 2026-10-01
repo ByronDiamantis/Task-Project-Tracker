@@ -1,7 +1,7 @@
 import { TaskResponse } from "./task";
 
 export interface ProjectRequest {
-  name: string;        
+  title: string;        
   description?: string;
   ownerId: number;
 }
